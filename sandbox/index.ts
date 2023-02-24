@@ -21,5 +21,10 @@ const run = async () => {
     const house = await client.hGetAll('house');
 
     console.log(house);
+
+    var key10 = await client.hGetAll('key10');
+    // If key1 is doesn't exist in 
+    // redis it return {} instead of null
+    console.log(key10);
 };
 run();
