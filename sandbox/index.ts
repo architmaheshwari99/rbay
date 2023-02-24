@@ -2,29 +2,28 @@ import 'dotenv/config';
 import { client } from '../src/services/redis';
 
 const run = async () => {
-    await client.hSet('car', {
-        'color': 'red',
-        'type': 'SUV'
+    await client.hSet('car2', {
+        'color': 'red2',
+        'type': 'SUV2'
     });
 
-    const car = await client.hGetAll('car');
-
-    console.log(car);
-
-    await client.hSet('house', {
-        'color': 'red',
-        'type': 'flat',
-        'maintenance': {'Jan': 'Y'},
-        'owner': null || '', // This is reqquired to fix null error is toString
+    await client.hSet('car3', {
+        'color': 'red3',
+        'type': 'SUV3'
     });
 
-    const house = await client.hGetAll('house');
+    await client.hSet('car4', {
+        'color': 'red4',
+        'type': 'SUV4'
+    });
 
-    console.log(house);
+    // Pipelining
+    const result = await Promise.all([
+        client.hGetAll('car2'),
+        client.hGetAll('car3'),
+        client.hGetAll('car4'),
+    ]);
+    console.log(result);
 
-    var key10 = await client.hGetAll('key10');
-    // If key1 is doesn't exist in 
-    // redis it return {} instead of null
-    console.log(key10);
 };
 run();
