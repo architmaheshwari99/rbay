@@ -5,6 +5,19 @@ import { getItem } from './items';
 import type { CreateBidAttrs, Bid } from '$services/types';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
+	const item = await getItem(attrs.itemId);
+
+	if(!item) {
+		throw new Error('Item not found')
+	}
+
+	if(item.price >= attrs.amount){
+		throw new Error('Bid too low')
+	}
+
+	if (item.endingAt.diff(DateTime.now()).toMillis()>0){
+		throw new Error('Item closed for bidding')
+	}
 
 	const serialized = serializeHistory(
 		attrs.amount, 

@@ -1,4 +1,4 @@
-export const pageCacheKey = (id: String) => `pagecache#${id}`;
+export const pageCacheKey = (id: string) => `pagecache#${id}`;
 
 export const usersKey = (userId: string) => `users#${userId}`;
 
@@ -14,6 +14,6 @@ export const usernamesKey = () => `usernames`;
 export const itemsKey = (itemId: string) => `items#${itemId}`;
 export const itemsByViewsKey = () => `itemsByViews`;
 export const itemsByEndingAtKey = () => `itemsByEndingAt`;
-export const itemsViewsKey = (itemId: String) => `itemsViewsKey#${itemId}`;
-
+export const itemsViewsKey = (itemId: string) => `itemsViewsKey#${itemId}`;
+export const bidHistoryKey = (itemId: string) => `history#${itemId}`;
 
