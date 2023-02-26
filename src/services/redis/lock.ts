@@ -1,7 +1,7 @@
 import {randomBytes} from 'crypto';
 import { client } from '$services/redis';
 
-export const withLock = async (key: string, cb: () => any) => {
+export const withLock = async (key: string, cb: (signal: any) => any) => {
 
 	const retryDelayMs = 100;
 	let retries = 20;
@@ -17,7 +17,7 @@ export const withLock = async (key: string, cb: () => any) => {
 		retries--;
 		const acquired = await client.set(lockKey, token, {
 			NX: true,
-			PX: 2000
+			PX: 200
 		});
 
 		if(!acquired){
@@ -27,10 +27,14 @@ export const withLock = async (key: string, cb: () => any) => {
 		// Unset the lock
 
 		try {
-			const result = await cb();
+			const signal = {expired: false}
+			setTimeout(()=> {
+				signal.expired = true;
+			})
+			const result = await cb(signal);
 			return result;
 		} finally {
-			await client.del(lockKey);
+			await client.unlock(lockKey, token);
 		}
 	} 
 };
