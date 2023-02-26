@@ -5,35 +5,39 @@ import { getItem } from './items';
 import type { CreateBidAttrs, Bid } from '$services/types';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
-	const item = await getItem(attrs.itemId);
 
-	if (!item) {
-		throw new Error('Item not found')
-	}
+	return client.executeIsolated(async (isolatedClient)=> {
+		await isolatedClient.watch(itemsKey(attrs.itemId));
 
-	if (item.price >= attrs.amount) {
-		throw new Error('Bid too low')
-	}
+		const item = await getItem(attrs.itemId);
 
-	if (item.endingAt.diff(DateTime.now()).toMillis() < 0) {
-		throw new Error('Item closed for bidding')
-	}
+		if (!item) {
+			throw new Error('Item not found')
+		}
+	
+		if (item.price >= attrs.amount) {
+			throw new Error('Bid too low')
+		}
+	
+		if (item.endingAt.diff(DateTime.now()).toMillis() < 0) {
+			throw new Error('Item closed for bidding')
+		}
+	
+		const serialized = serializeHistory(
+			attrs.amount,
+			attrs.createdAt
+		);
+	
+		return isolatedClient.multi().
+				rPush(bidHistoryKey(attrs.itemId), serialized)
+				.hSet(itemsKey(item.id), {
+					bids: item.bids + 1,
+					price: attrs.amount,
+					highestBidUserId: attrs.userId
+				})
+				.exec();
+			});
 
-	const serialized = serializeHistory(
-		attrs.amount,
-		attrs.createdAt
-	);
-
-	Promise.all(
-		[
-			client.rPush(bidHistoryKey(attrs.itemId), serialized),
-			client.hSet(itemsKey(item.id), {
-				bids: item.bids + 1,
-				price: attrs.amount,
-				highestBidUserId: attrs.userId
-			})
-		]
-	)
 };
 
 export const getBidHistory = async (itemId: string, offset = 0, count = 10): Promise<Bid[]> => {
