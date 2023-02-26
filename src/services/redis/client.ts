@@ -28,7 +28,7 @@ const client = createClient({
 				local itemId = ARGV[1];
 				local userId = ARGV[1];
 
-				local inserted = redis.call('PFADD', itemsViewKey, userId)
+				local inserted = redis.call('PFADD', itemsViewsKey, userId)
 
 				if inserted==1 then
 					redis.call('HINCRBY', itemsKey, 'views', 1)
