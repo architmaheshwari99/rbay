@@ -17,7 +17,7 @@ export const withLock = async (key: string, cb: (signal: any) => any) => {
 		retries--;
 		const acquired = await client.set(lockKey, token, {
 			NX: true,
-			PX: 200
+			PX: 2000
 		});
 
 		if(!acquired){
@@ -30,7 +30,7 @@ export const withLock = async (key: string, cb: (signal: any) => any) => {
 			const signal = {expired: false}
 			setTimeout(()=> {
 				signal.expired = true;
-			})
+			}, 2000)
 			const result = await cb(signal);
 			return result;
 		} finally {
