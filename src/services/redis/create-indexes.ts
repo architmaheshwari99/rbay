@@ -14,12 +14,34 @@ export const createIndexes = async () => {
 		itemsIndexKey(),
 		{
 			name: {
-				type: SchemaFieldTypes.TEXT
+				type: SchemaFieldTypes.TEXT,
+                sortable: true
 			},
 			description: {
-				type: SchemaFieldTypes.TEXT
-			}
-		},
+				type: SchemaFieldTypes.TEXT,
+                sortable: false
+			},
+            ownerId: {
+                type: SchemaFieldTypes.TAG,
+                sortable: false
+            },
+            endingAt: {
+                type: SchemaFieldTypes.NUMERIC,
+                sortable: true
+            },
+            bids: {
+                type: SchemaFieldTypes.NUMERIC,
+                sortable: true
+            },
+            price: {
+                type: SchemaFieldTypes.NUMERIC,
+                sortable: true
+            },
+            like:{
+                type: SchemaFieldTypes.NUMERIC,
+                sortable: true
+            }
+		} as any,
 		{
 			ON: 'HASH',
 			PREFIX: itemsKey('')
