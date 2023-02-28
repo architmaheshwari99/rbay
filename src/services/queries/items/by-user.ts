@@ -1,3 +1,8 @@
+import { client } from '$services/redis';
+import { deserialize } from './deserialize';
+import { itemsIndexKey, itemsKey } from '$services/keys';
+
+
 interface QueryOpts {
 	page: number;
 	perPage: number;
@@ -6,5 +11,27 @@ interface QueryOpts {
 }
 
 export const itemsByUser = async (userId: string, opts: QueryOpts) => {
-	return [];
+
+	const query = `@ownerId:{${userId}}`
+	const sortCriteria = opts.sortBy && opts.direction && {
+		BY: opts.sortBy, DIRECTION: opts.direction	
+	};
+
+	const { total, documents } = await client.ft.search(
+									itemsIndexKey(), 
+									query,
+									{
+										ON: "HASH",
+										SORTBY: sortCriteria,
+										LIMIT: {
+											from: opts.page * opts.perPage,
+											size: opts.perPage
+										}
+									} as any)
+
+	console.log(total, documents)
+	return {
+		totalPages: 0,
+		items: []
+	};
 };
